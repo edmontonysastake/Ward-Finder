@@ -194,13 +194,13 @@ function findWard() {
             if (foundWard) {
 
                 document.getElementById('result').innerHTML =
-                    '<strong>Your YSA region is:</strong><br>' +
+                    '<strong>Your YSA Ward is:</strong><br>' +
                     foundWard;
 
             } else {
 
                 document.getElementById('result').innerHTML =
-                    '<strong>This address is outside the four YSA regions.</strong>';
+                    '<strong>This address is outside the four YSA wards for ages 18-25.</strong>';
 
             }
 
