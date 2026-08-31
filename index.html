@@ -3,26 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Edmonton YSA Ward Finder</title>
+
+    <!-- Leaflet map -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h1>Edmonton YSA Ward Finder</h1>
+    <div class="container">
 
-    <p>Enter your address to find your ward.</p>
+        <h1>Edmonton YSA Ward Finder</h1>
 
-    <input
-        type="text"
-        id="address"
-        placeholder="Enter your address"
-    >
+        <p>Enter an address to find your ward.</p>
 
-    <button onclick="findWard()">
-        Find My Ward
-    </button>
+        <div class="search">
+            <input
+                type="text"
+                id="address"
+                placeholder="Enter your address"
+            >
 
-    <div id="result"></div>
+            <button onclick="findWard()">
+                Find My Ward
+            </button>
+        </div>
+
+        <div id="result"></div>
+
+        <div id="map"></div>
+
+    </div>
+
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="app.js"></script>
 
 </body>
 </html>
