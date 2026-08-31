@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
 
+    <!-- Website styling -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -24,15 +26,23 @@
         <p>Enter an address to find your ward.</p>
 
         <div class="search">
+
             <input
                 type="text"
-                id="address"
-                placeholder="Enter your address"
+                id="streetAddress"
+                placeholder="Street address"
+            >
+
+            <input
+                type="text"
+                id="city"
+                placeholder="City"
             >
 
             <button onclick="findWard()">
                 Find My Ward
             </button>
+
         </div>
 
         <div id="result"></div>
@@ -41,13 +51,16 @@
 
     </div>
 
-        <!-- Leaflet -->
+
+    <!-- Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- KML converter -->
     <script src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js"></script>
 
+    <!-- Our JavaScript -->
     <script src="app.js"></script>
 
 </body>
 </html>
+```
