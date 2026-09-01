@@ -1,8 +1,4 @@
 ```javascript
-// ============================================================
-// Edmonton YSA Ward Finder
-// ============================================================
-
 // Create the map centered on Edmonton
 const map = L.map('map').setView([53.5461, -113.4938], 10);
 
@@ -15,19 +11,14 @@ L.tileLayer(
 ).addTo(map);
 
 
-// ============================================================
-// Variables
-// ============================================================
-
+// Variable to hold the ward boundaries
 let wardLayer;
 
 
-// ============================================================
-// Load the ward boundaries from wards.kml
-// ============================================================
-
+// Load the ward boundaries
 fetch('wards.kml')
     .then(response => {
+
         if (!response.ok) {
             throw new Error('Could not load wards.kml');
         }
@@ -39,26 +30,24 @@ fetch('wards.kml')
 
         console.log('KML loaded');
 
-        // Convert KML XML into GeoJSON
+        // Convert KML into XML
         const parser = new DOMParser();
         const kml = parser.parseFromString(kmlText, 'text/xml');
 
-        // Check for XML parsing errors
+        // Check for XML errors
         const parserError = kml.querySelector('parsererror');
 
         if (parserError) {
             throw new Error('The KML file could not be parsed.');
         }
 
+        // Convert KML to GeoJSON
         const geojson = toGeoJSON.kml(kml);
 
         console.log('Converted KML to GeoJSON:', geojson);
 
 
-        // ====================================================
-        // Add boundaries to the map
-        // ====================================================
-
+        // Add the boundaries to the map
         wardLayer = L.geoJSON(geojson, {
 
             style: function(feature) {
@@ -71,51 +60,54 @@ fetch('wards.kml')
                 const ward = name.toLowerCase();
 
 
-                // Garneau Ward
                 if (ward.includes('garneau')) {
+
                     return {
                         color: '#f1c40f',
                         weight: 3,
                         fillColor: '#f1c40f',
                         fillOpacity: 0.25
                     };
+
                 }
 
 
-                // Gateway Ward
                 if (ward.includes('gateway')) {
+
                     return {
                         color: '#e74c3c',
                         weight: 3,
                         fillColor: '#e74c3c',
                         fillOpacity: 0.25
                     };
+
                 }
 
 
-                // Whitemud Creek Ward
                 if (ward.includes('whitemud')) {
+
                     return {
                         color: '#3498db',
                         weight: 3,
                         fillColor: '#3498db',
                         fillOpacity: 0.25
                     };
+
                 }
 
 
-                // Windsor Park Ward
                 if (ward.includes('windsor')) {
+
                     return {
                         color: '#2ecc71',
                         weight: 3,
                         fillColor: '#2ecc71',
                         fillOpacity: 0.25
                     };
+
                 }
 
 
-                // Default appearance
                 return {
                     color: '#333',
                     weight: 3,
@@ -125,10 +117,6 @@ fetch('wards.kml')
             },
 
 
-            // =================================================
-            // What happens when someone clicks a ward
-            // =================================================
-
             onEachFeature: function(feature, layer) {
 
                 const name =
@@ -136,25 +124,31 @@ fetch('wards.kml')
                     feature.properties?.Name ||
                     'Ward';
 
+
                 layer.bindPopup(
                     '<strong>' + name + '</strong>'
                 );
 
 
-                // Highlight ward when mouse moves over it
                 layer.on({
 
                     mouseover: function(e) {
+
                         e.target.setStyle({
                             weight: 5,
                             fillOpacity: 0.4
                         });
+
                     },
 
                     mouseout: function(e) {
+
                         wardLayer.resetStyle(e.target);
+
                     }
+
                 });
+
             }
 
         }).addTo(map);
@@ -162,11 +156,15 @@ fetch('wards.kml')
 
         // Make sure boundaries were found
         if (!wardLayer.getLayers().length) {
-            throw new Error('No boundaries were found in wards.kml');
+
+            throw new Error(
+                'No boundaries were found in wards.kml'
+            );
+
         }
 
 
-        // Zoom map to the four wards
+        // Zoom to the four wards
         map.fitBounds(wardLayer.getBounds());
 
 
@@ -176,23 +174,23 @@ fetch('wards.kml')
     })
 
 
-    // ========================================================
-    // Error handling for the KML
-    // ========================================================
-
     .catch(error => {
 
-        console.error('Boundary loading error:', error);
+        console.error(
+            'Boundary loading error:',
+            error
+        );
 
         document.getElementById('result').innerHTML =
             'There was a problem loading the ward boundaries: ' +
             error.message;
+
     });
 
 
 
 // ============================================================
-// ADDRESS SEARCH
+// FIND WARD
 // ============================================================
 
 function findWard() {
@@ -204,7 +202,7 @@ function findWard() {
         document.getElementById('city').value.trim();
 
 
-    // Make sure both fields have something in them
+    // Check that both fields have been filled out
     if (!streetAddress || !city) {
 
         document.getElementById('result').innerHTML =
@@ -214,44 +212,46 @@ function findWard() {
     }
 
 
-    // Show that the search is happening
     document.getElementById('result').innerHTML =
         'Searching for your address...';
 
 
-    // Combine the address fields
+    // Combine the address
     const fullAddress =
-        streetAddress + ', ' + city + ', Alberta, Canada';
+        streetAddress +
+        ', ' +
+        city +
+        ', Alberta, Canada';
 
 
-    // ========================================================
-    // Use OpenStreetMap/Nominatim to find the address
-    // ========================================================
-
+    // Search OpenStreetMap
     const url =
         'https://nominatim.openstreetmap.org/search?format=json' +
-        '&q=' + encodeURIComponent(fullAddress) +
+        '&q=' +
+        encodeURIComponent(fullAddress) +
         '&limit=1';
 
 
-    fetch(url, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    })
+    fetch(url)
 
         .then(response => {
 
             if (!response.ok) {
-                throw new Error('Unable to search for the address.');
+
+                throw new Error(
+                    'Unable to search for the address.'
+                );
+
             }
 
             return response.json();
+
         })
 
 
         .then(data => {
 
+            // Address wasn't found
             if (!data.length) {
 
                 document.getElementById('result').innerHTML =
@@ -262,7 +262,7 @@ function findWard() {
             }
 
 
-            // Get the coordinates returned by the address search
+            // Get coordinates
             const lat =
                 parseFloat(data[0].lat);
 
@@ -270,29 +270,38 @@ function findWard() {
                 parseFloat(data[0].lon);
 
 
-            console.log('Address coordinates:', lat, lon);
+            console.log(
+                'Address coordinates:',
+                lat,
+                lon
+            );
 
 
-            // =================================================
-            // Put a marker on the address
-            // =================================================
-
+            // Remove previous marker
             if (window.addressMarker) {
-                map.removeLayer(window.addressMarker);
+
+                map.removeLayer(
+                    window.addressMarker
+                );
+
             }
 
 
+            // Add address marker
             window.addressMarker =
                 L.marker([lat, lon])
                     .addTo(map);
 
 
-            // Zoom to the address
-            map.setView([lat, lon], 14);
+            // Zoom to address
+            map.setView(
+                [lat, lon],
+                14
+            );
 
 
             // =================================================
-            // Determine which ward contains the address
+            // Find which ward contains the address
             // =================================================
 
             let foundWard = null;
@@ -325,13 +334,14 @@ function findWard() {
                         feature.properties?.name ||
                         feature.properties?.Name ||
                         'Unknown Ward';
+
                 }
 
             });
 
 
             // =================================================
-            // Display the result
+            // Display result
             // =================================================
 
             if (foundWard) {
@@ -353,18 +363,23 @@ function findWard() {
 
         .catch(error => {
 
-            console.error('Address search error:', error);
+            console.error(
+                'Address search error:',
+                error
+            );
 
             document.getElementById('result').innerHTML =
                 '<strong>There was a problem finding that address.</strong><br>' +
                 'Please check the address and try again.';
+
         });
+
 }
 
 
 
 // ============================================================
-// POINT-IN-POLYGON FUNCTION
+// POINT IN POLYGON
 // ============================================================
 
 function pointInPolygon(point, geometry) {
@@ -381,7 +396,9 @@ function pointInPolygon(point, geometry) {
 
     if (geometry.type === 'MultiPolygon') {
 
-        for (const polygon of geometry.coordinates) {
+        for (
+            const polygon of geometry.coordinates
+        ) {
 
             if (
                 pointInPolygonRings(
@@ -389,8 +406,11 @@ function pointInPolygon(point, geometry) {
                     polygon
                 )
             ) {
+
                 return true;
+
             }
+
         }
 
     }
@@ -402,24 +422,30 @@ function pointInPolygon(point, geometry) {
 
 
 // ============================================================
-// Check polygon rings
+// POLYGON RINGS
 // ============================================================
 
 function pointInPolygonRings(point, rings) {
 
-    // Check the outside boundary
+    // Check outer boundary
     if (
         !pointInRing(
             point,
             rings[0]
         )
     ) {
+
         return false;
+
     }
 
 
-    // Check holes inside the polygon
-    for (let i = 1; i < rings.length; i++) {
+    // Check holes
+    for (
+        let i = 1;
+        i < rings.length;
+        i++
+    ) {
 
         if (
             pointInRing(
@@ -427,8 +453,11 @@ function pointInPolygonRings(point, rings) {
                 rings[i]
             )
         ) {
+
             return false;
+
         }
+
     }
 
 
@@ -438,7 +467,7 @@ function pointInPolygonRings(point, rings) {
 
 
 // ============================================================
-// Ray-casting algorithm
+// RAY CASTING
 // ============================================================
 
 function pointInRing(point, ring) {
@@ -474,8 +503,11 @@ function pointInRing(point, ring) {
 
 
         if (intersect) {
+
             inside = !inside;
+
         }
+
     }
 
 
