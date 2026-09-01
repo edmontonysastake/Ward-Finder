@@ -1,55 +1,85 @@
+```css
+/* ============================================================
+   Edmonton YSA Ward Finder
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
     background: #f5f5f5;
+    color: #333;
 }
 
 .container {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 30px 20px;
+    padding: 20px;
 }
 
 h1 {
-    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
 }
 
 p {
-    text-align: center;
+    margin-top: 0;
 }
 
 .search {
     display: flex;
     gap: 10px;
-    max-width: 700px;
-    margin: 25px auto;
+    margin: 20px 0;
+    flex-wrap: wrap;
 }
 
-#address {
-    flex: 1;
-    padding: 14px;
+.search input {
+    padding: 12px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 6px;
+    border-radius: 4px;
+    flex: 1;
+    min-width: 200px;
 }
 
-button {
-    padding: 14px 22px;
+.search button {
+    padding: 12px 20px;
     font-size: 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
+    background: #333;
+    color: white;
     cursor: pointer;
 }
 
+.search button:hover {
+    background: #555;
+}
+
 #result {
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    margin: 20px;
+    margin: 15px 0;
+    padding: 10px;
+    font-size: 16px;
 }
 
 #map {
-    height: 600px;
     width: 100%;
-    border-radius: 10px;
+    height: 600px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
+
+/* Address reminder */
+
+.address-note {
+    font-size: 14px;
+    color: #555;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+```
