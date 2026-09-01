@@ -1,276 +1,889 @@
-let wardLayer;
-let map;
+// ============================================================
+// Edmonton YSA Ward Finder
+// ============================================================
 
-// Create the map centered on Edmonton
-map = L.map('map').setView([53.5461, -113.4938], 10);
 
-// Add OpenStreetMap tiles
+// ------------------------------------------------------------
+// Create the map
+// ------------------------------------------------------------
+
+const map = L.map('map').setView(
+    [53.5461, -113.4938],
+    10
+);
+
+
+// ------------------------------------------------------------
+// Add OpenStreetMap
+// ------------------------------------------------------------
+
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution:
+            '&copy; OpenStreetMap contributors'
     }
 ).addTo(map);
 
 
-// Load the ward boundaries
+// ------------------------------------------------------------
+// Variables
+// ------------------------------------------------------------
+
+let wardLayer = null;
+
+let addressMarker = null;
+
+
+// ------------------------------------------------------------
+// Load wards.kml
+// ------------------------------------------------------------
+
 fetch('wards.kml')
-    .then(response => {
+
+    .then(function(response) {
+
         if (!response.ok) {
-            throw new Error('Could not load wards.kml');
+
+            throw new Error(
+                'Could not load wards.kml.'
+            );
+
         }
+
         return response.text();
-    })
-    .then(kmlText => {
-
-        const parser = new DOMParser();
-        const kml = parser.parseFromString(kmlText, 'text/xml');
-
-        const geojson = toGeoJSON.kml(kml);
-
-        // Add boundaries to the map
-        wardLayer = L.geoJSON(geojson, {
-
-            style: function(feature) {
-
-                const name =
-                    feature.properties?.name ||
-                    feature.properties?.Name ||
-                    'Region';
-
-                const ward = name.toLowerCase();
-
-                if (ward.includes('garneau')) {
-                    return {
-                        color: '#f1c40f',
-                        weight: 3,
-                        fillColor: '#f1c40f',
-                        fillOpacity: 0.25
-                    };
-                }
-
-                if (ward.includes('gateway')) {
-                    return {
-                        color: '#e74c3c',
-                        weight: 3,
-                        fillColor: '#e74c3c',
-                        fillOpacity: 0.25
-                    };
-                }
-
-                if (ward.includes('whitemud')) {
-                    return {
-                        color: '#3498db',
-                        weight: 3,
-                        fillColor: '#3498db',
-                        fillOpacity: 0.25
-                    };
-                }
-
-                if (ward.includes('windsor')) {
-                    return {
-                        color: '#2ecc71',
-                        weight: 3,
-                        fillColor: '#2ecc71',
-                        fillOpacity: 0.25
-                    };
-                }
-
-                return {
-                    color: '#333',
-                    weight: 3,
-                    fillColor: '#999',
-                    fillOpacity: 0.25
-                };
-            },
-
-            onEachFeature: function(feature, layer) {
-
-                const name =
-                    feature.properties?.name ||
-                    feature.properties?.Name ||
-                    'Region';
-
-                layer.bindPopup(
-                    '<strong>' + name + '</strong>'
-                );
-
-            }
-
-        }).addTo(map);
-
-        map.fitBounds(wardLayer.getBounds());
-
-        document.getElementById('result').innerHTML =
-            'Region boundaries loaded successfully.';
 
     })
-    .catch(error => {
 
-        console.error('Boundary loading error:', error);
 
-        document.getElementById('result').innerHTML =
-            'There was a problem loading the region boundaries: ' +
+    .then(function(kmlText) {
+
+        console.log('KML loaded successfully.');
+
+
+        // Parse KML
+        const parser =
+            new DOMParser();
+
+        const kml =
+            parser.parseFromString(
+                kmlText,
+                'text/xml'
+            );
+
+
+        // Check for XML parsing errors
+        const parserError =
+            kml.querySelector(
+                'parsererror'
+            );
+
+
+        if (parserError) {
+
+            throw new Error(
+                'The KML file could not be parsed.'
+            );
+
+        }
+
+
+        // Convert KML to GeoJSON
+        const geojson =
+            toGeoJSON.kml(kml);
+
+
+        console.log(
+            'Converted KML to GeoJSON:',
+            geojson
+        );
+
+
+        // ----------------------------------------------------
+        // Create ward layer
+        // ----------------------------------------------------
+
+        wardLayer =
+            L.geoJSON(
+                geojson,
+                {
+
+                    style:
+                        function(feature) {
+
+                            const name =
+                                getWardName(
+                                    feature
+                                );
+
+                            const ward =
+                                name.toLowerCase();
+
+
+                            // Garneau
+                            if (
+                                ward.includes(
+                                    'garneau'
+                                )
+                            ) {
+
+                                return {
+                                    color: '#f1c40f',
+                                    weight: 3,
+                                    fillColor: '#f1c40f',
+                                    fillOpacity: 0.25
+                                };
+
+                            }
+
+
+                            // Gateway
+                            if (
+                                ward.includes(
+                                    'gateway'
+                                )
+                            ) {
+
+                                return {
+                                    color: '#e74c3c',
+                                    weight: 3,
+                                    fillColor: '#e74c3c',
+                                    fillOpacity: 0.25
+                                };
+
+                            }
+
+
+                            // Whitemud Creek
+                            if (
+                                ward.includes(
+                                    'whitemud'
+                                )
+                            ) {
+
+                                return {
+                                    color: '#3498db',
+                                    weight: 3,
+                                    fillColor: '#3498db',
+                                    fillOpacity: 0.25
+                                };
+
+                            }
+
+
+                            // Windsor Park
+                            if (
+                                ward.includes(
+                                    'windsor'
+                                )
+                            ) {
+
+                                return {
+                                    color: '#2ecc71',
+                                    weight: 3,
+                                    fillColor: '#2ecc71',
+                                    fillOpacity: 0.25
+                                };
+
+                            }
+
+
+                            // Default
+                            return {
+                                color: '#333',
+                                weight: 3,
+                                fillColor: '#999',
+                                fillOpacity: 0.25
+                            };
+
+                        },
+
+
+                    // ------------------------------------------------
+                    // Ward interaction
+                    // ------------------------------------------------
+
+                    onEachFeature:
+                        function(
+                            feature,
+                            layer
+                        ) {
+
+                            const name =
+                                getWardName(
+                                    feature
+                                );
+
+
+                            layer.bindPopup(
+                                '<strong>' +
+                                name +
+                                '</strong>'
+                            );
+
+
+                            layer.on({
+
+                                mouseover:
+                                    function(e) {
+
+                                        e.target.setStyle({
+                                            weight: 5,
+                                            fillOpacity: 0.4
+                                        });
+
+                                    },
+
+
+                                mouseout:
+                                    function(e) {
+
+                                        wardLayer.resetStyle(
+                                            e.target
+                                        );
+
+                                    }
+
+                            });
+
+                        }
+
+                }
+            )
+            .addTo(map);
+
+
+        // Make sure we actually found wards
+        if (
+            wardLayer.getLayers().length === 0
+        ) {
+
+            throw new Error(
+                'No ward boundaries were found in wards.kml.'
+            );
+
+        }
+
+
+        console.log(
+            'Number of wards:',
+            wardLayer.getLayers().length
+        );
+
+
+        // Zoom to the wards
+        map.fitBounds(
+            wardLayer.getBounds()
+        );
+
+
+        document.getElementById(
+            'result'
+        ).innerHTML =
+            'Ward boundaries loaded successfully.';
+
+    })
+
+
+    .catch(function(error) {
+
+        console.error(
+            'Boundary loading error:',
+            error
+        );
+
+
+        document.getElementById(
+            'result'
+        ).innerHTML =
+            '<strong>There was a problem loading the ward boundaries.</strong><br>' +
             error.message;
 
     });
 
 
-// Find which ward contains an address
-function findWard() {
+// ============================================================
+// Get ward name
+// ============================================================
 
-    const streetAddress =
-        document.getElementById('streetAddress').value.trim();
+function getWardName(feature) {
 
-    const city =
-        document.getElementById('city').value.trim();
+    if (
+        feature &&
+        feature.properties
+    ) {
 
-    // Make sure both fields have something in them
-    if (!streetAddress || !city) {
+        return (
+            feature.properties.name ||
+            feature.properties.Name ||
+            feature.properties.ward ||
+            feature.properties.Ward ||
+            'Unknown Ward'
+        );
 
-        document.getElementById('result').innerHTML =
-            'Please enter both a street address and city.';
-
-        return;
     }
 
-    document.getElementById('result').innerHTML =
-        'Searching for address...';
 
-    // Combine the two fields for geocoding
+    return 'Unknown Ward';
+}
+
+
+// ============================================================
+// FIND MY WARD
+// ============================================================
+
+function findWard() {
+
+    // --------------------------------------------------------
+    // Get address
+    // --------------------------------------------------------
+
+    const address =
+        document
+            .getElementById('address')
+            .value
+            .trim();
+
+
+    const city =
+        document
+            .getElementById('city')
+            .value
+            .trim();
+
+
+    const result =
+        document.getElementById(
+            'result'
+        );
+
+
+    const button =
+        document.getElementById(
+            'findWardButton'
+        );
+
+
+    // --------------------------------------------------------
+    // Validate fields
+    // --------------------------------------------------------
+
+    if (!address) {
+
+        result.innerHTML =
+            '<strong>Please enter your street address.</strong>';
+
+        return;
+
+    }
+
+
+    if (!city) {
+
+        result.innerHTML =
+            '<strong>Please enter your city.</strong>';
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // Check that the ward boundaries are loaded
+    // --------------------------------------------------------
+
+    if (!wardLayer) {
+
+        result.innerHTML =
+            '<strong>The ward boundaries are still loading. Please try again in a moment.</strong>';
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // Disable button while searching
+    // --------------------------------------------------------
+
+    button.disabled = true;
+
+    button.textContent =
+        'Searching...';
+
+
+    result.innerHTML =
+        'Searching for your address...';
+
+
+    // --------------------------------------------------------
+    // Build complete address
+    // --------------------------------------------------------
+
     const fullAddress =
-        streetAddress + ', ' + city + ', Alberta, Canada';
+        address +
+        ', ' +
+        city +
+        ', Alberta, Canada';
 
-    // Use OpenStreetMap's free geocoding service
+
+    console.log(
+        'Searching for:',
+        fullAddress
+    );
+
+
+    // --------------------------------------------------------
+    // OpenStreetMap address search
+    // --------------------------------------------------------
+
     const url =
-        'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ca&q=' +
-        encodeURIComponent(fullAddress);
+        'https://nominatim.openstreetmap.org/search' +
+        '?format=json' +
+        '&q=' +
+        encodeURIComponent(
+            fullAddress
+        ) +
+        '&limit=1';
+
 
     fetch(url)
-        .then(response => response.json())
-        .then(results => {
 
-            if (!results.length) {
+        .then(function(response) {
 
-                document.getElementById('result').innerHTML =
-                    'Address not found. Please check the street address and city.';
+            if (!response.ok) {
 
-                return;
+                throw new Error(
+                    'The address search service could not be reached.'
+                );
+
             }
 
-            const lat = parseFloat(results[0].lat);
-            const lon = parseFloat(results[0].lon);
+            return response.json();
 
-            // Put a marker at the searched address
-            const marker = L.marker([lat, lon]).addTo(map);
+        })
 
-            marker.bindPopup(
-                '<strong>Address</strong><br>' +
-                fullAddress
-            ).openPopup();
 
-            map.setView([lat, lon], 15);
+        .then(function(data) {
 
-            document.getElementById('result').innerHTML =
-                'Address found. Checking region...';
+            // ------------------------------------------------
+            // Address not found
+            // ------------------------------------------------
 
-            // Check each ward polygon
-            let foundWard = null;
+            if (
+                !data ||
+                data.length === 0
+            ) {
 
-            wardLayer.eachLayer(function(layer) {
+                result.innerHTML =
+                    '<strong>Address not found.</strong><br>' +
+                    'Please check the address and make sure you included NW or SW.';
 
-                const geojson = layer.toGeoJSON();
+                return;
 
-                if (pointInPolygon([lon, lat], geojson.geometry)) {
+            }
 
-                    foundWard =
-                        layer.feature.properties?.name ||
-                        layer.feature.properties?.Name ||
-                        'Unknown region';
+
+            // ------------------------------------------------
+            // Coordinates
+            // ------------------------------------------------
+
+            const lat =
+                parseFloat(
+                    data[0].lat
+                );
+
+
+            const lon =
+                parseFloat(
+                    data[0].lon
+                );
+
+
+            console.log(
+                'Address coordinates:',
+                lat,
+                lon
+            );
+
+
+            // ------------------------------------------------
+            // Remove old marker
+            // ------------------------------------------------
+
+            if (addressMarker) {
+
+                map.removeLayer(
+                    addressMarker
+                );
+
+            }
+
+
+            // ------------------------------------------------
+            // Add new marker
+            // ------------------------------------------------
+
+            addressMarker =
+                L.marker(
+                    [lat, lon]
+                )
+                .addTo(map);
+
+
+            addressMarker.bindPopup(
+                '<strong>Your address</strong>'
+            );
+
+
+            // ------------------------------------------------
+            // Zoom to address
+            // ------------------------------------------------
+
+            map.setView(
+                [lat, lon],
+                14
+            );
+
+
+            // ------------------------------------------------
+            // Find ward
+            // ------------------------------------------------
+
+            let foundWard =
+                null;
+
+
+            wardLayer.eachLayer(
+                function(layer) {
+
+                    if (foundWard) {
+                        return;
+                    }
+
+
+                    const feature =
+                        layer.feature;
+
+
+                    if (
+                        !feature ||
+                        !feature.geometry
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        pointInGeometry(
+                            [lon, lat],
+                            feature.geometry
+                        )
+                    ) {
+
+                        foundWard =
+                            getWardName(
+                                feature
+                            );
+
+                    }
+
                 }
+            );
 
-            });
+
+            // ------------------------------------------------
+            // Display result
+            // ------------------------------------------------
 
             if (foundWard) {
 
-                document.getElementById('result').innerHTML =
-                    '<strong>Your YSA region is:</strong><br>' +
-                    foundWard;
+                result.innerHTML =
+                    '<strong>Your YSA Ward is: ' +
+                    foundWard +
+                    '</strong>';
 
-            } else {
 
-                document.getElementById('result').innerHTML =
-                    '<strong>This address is outside the four YSA regions.</strong>';
+                addressMarker.bindPopup(
+                    '<strong>Your YSA Ward is:</strong><br>' +
+                    foundWard
+                );
+
+
+                addressMarker.openPopup();
+
+            }
+
+
+            else {
+
+                result.innerHTML =
+                    '<strong>This address is outside the four YSA ward boundaries.</strong>';
 
             }
 
         })
-        .catch(error => {
 
-            console.error(error);
 
-            document.getElementById('result').innerHTML =
-                'There was a problem searching for that address.';
+        .catch(function(error) {
+
+            console.error(
+                'Address search error:',
+                error
+            );
+
+
+            result.innerHTML =
+                '<strong>There was a problem finding that address.</strong><br>' +
+                'Please check the address and try again.';
+
+        })
+
+
+        .finally(function() {
+
+            button.disabled = false;
+
+            button.textContent =
+                'Find My Ward';
 
         });
+
 }
 
 
-// Determine whether a point is inside a polygon
-function pointInPolygon(point, geometry) {
+// ============================================================
+// POINT IN GEOMETRY
+// ============================================================
 
-    const x = point[0];
-    const y = point[1];
+function pointInGeometry(
+    point,
+    geometry
+) {
 
-    const coordinates = geometry.coordinates;
+    if (
+        geometry.type ===
+        'Polygon'
+    ) {
 
-    // Polygon
-    if (geometry.type === 'Polygon') {
-        return polygonContainsPoint(coordinates[0], x, y);
+        return pointInPolygon(
+            point,
+            geometry.coordinates
+        );
+
     }
 
-    // MultiPolygon
-    if (geometry.type === 'MultiPolygon') {
 
-        for (const polygon of coordinates) {
+    if (
+        geometry.type ===
+        'MultiPolygon'
+    ) {
 
-            if (polygonContainsPoint(polygon[0], x, y)) {
+        for (
+            let i = 0;
+            i < geometry.coordinates.length;
+            i++
+        ) {
+
+            if (
+                pointInPolygon(
+                    point,
+                    geometry.coordinates[i]
+                )
+            ) {
+
                 return true;
+
             }
 
         }
 
     }
+
 
     return false;
 }
 
 
-// Ray-casting algorithm
-function polygonContainsPoint(polygon, x, y) {
+// ============================================================
+// POINT IN POLYGON
+// ============================================================
 
-    let inside = false;
+function pointInPolygon(
+    point,
+    rings
+) {
+
+    // --------------------------------------------------------
+    // Outside boundary
+    // --------------------------------------------------------
+
+    if (
+        !pointInRing(
+            point,
+            rings[0]
+        )
+    ) {
+
+        return false;
+
+    }
+
+
+    // --------------------------------------------------------
+    // Interior holes
+    // --------------------------------------------------------
 
     for (
-        let i = 0, j = polygon.length - 1;
-        i < polygon.length;
+        let i = 1;
+        i < rings.length;
+        i++
+    ) {
+
+        if (
+            pointInRing(
+                point,
+                rings[i]
+            )
+        ) {
+
+            return false;
+
+        }
+
+    }
+
+
+    return true;
+}
+
+
+// ============================================================
+// POINT IN RING
+// ============================================================
+
+function pointInRing(
+    point,
+    ring
+) {
+
+    const x =
+        point[0];
+
+    const y =
+        point[1];
+
+
+    let inside =
+        false;
+
+
+    for (
+        let i = 0,
+        j = ring.length - 1;
+
+        i < ring.length;
+
         j = i++
     ) {
 
-        const xi = polygon[i][0];
-        const yi = polygon[i][1];
+        const xi =
+            ring[i][0];
 
-        const xj = polygon[j][0];
-        const yj = polygon[j][1];
+        const yi =
+            ring[i][1];
 
-        const intersect =
-            ((yi > y) !== (yj > y)) &&
-            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
 
-        if (intersect) {
-            inside = !inside;
+        const xj =
+            ring[j][0];
+
+        const yj =
+            ring[j][1];
+
+
+        const intersects =
+            (
+                (yi > y) !==
+                (yj > y)
+            )
+            &&
+            (
+                x <
+                (
+                    (xj - xi) *
+                    (y - yi) /
+                    (yj - yi)
+                ) +
+                xi
+            );
+
+
+        if (intersects) {
+
+            inside =
+                !inside;
+
         }
+
     }
+
 
     return inside;
 }
+
+
+// ============================================================
+// BUTTON
+// ============================================================
+
+// Use an event listener instead of inline onclick.
+// This avoids the "findWard is not defined" problem we
+// encountered earlier.
+
+document
+    .getElementById(
+        'findWardButton'
+    )
+    .addEventListener(
+        'click',
+        findWard
+    );
+
+
+// Allow pressing Enter in either address field
+document
+    .getElementById('address')
+    .addEventListener(
+        'keydown',
+        function(event) {
+
+            if (
+                event.key === 'Enter'
+            ) {
+
+                findWard();
+
+            }
+
+        }
+    );
+
+
+document
+    .getElementById('city')
+    .addEventListener(
+        'keydown',
+        function(event) {
+
+            if (
+                event.key === 'Enter'
+            ) {
+
+                findWard();
+
+            }
+
+        }
+    );
