@@ -1,4 +1,3 @@
-```javascript
 // Create the map centered on Edmonton
 const map = L.map('map').setView([53.5461, -113.4938], 10);
 
@@ -513,4 +512,3 @@ function pointInRing(point, ring) {
 
     return inside;
 }
-```
