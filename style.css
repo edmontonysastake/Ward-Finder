@@ -50,22 +50,11 @@ AGE INFORMATION
 ============================================================ */
 
 .age-information {
-margin-bottom: 25px;
+margin-bottom: 20px;
 }
 
 .age-section {
-margin-bottom: 15px;
-
-```
-padding: 18px 20px;
-
-background: white;
-
-border: 1px solid #ddd;
-
-border-radius: 6px;
-```
-
+margin-bottom: 18px;
 }
 
 .age-section:last-child {
@@ -74,7 +63,7 @@ margin-bottom: 0;
 
 .age-section h2 {
 margin-top: 0;
-margin-bottom: 8px;
+margin-bottom: 6px;
 
 ```
 font-size: 20px;
@@ -97,31 +86,12 @@ color: #555;
 
 }
 
-/* Make the 26–35 section especially prominent */
-
-.age-section:first-child {
-background: #f0f7ff;
-
-```
-border-left: 5px solid #3498db;
-```
-
-}
-
-.age-section:first-child h2 {
-color: #245a8d;
-}
-
-.age-section:first-child strong {
-color: #245a8d;
-}
-
 /* ============================================================
 ADDRESS NOTE
 ============================================================ */
 
 .address-note {
-margin-top: 5px;
+margin-top: 20px;
 margin-bottom: 20px;
 
 ```
@@ -293,11 +263,6 @@ MOBILE
 
 h1 {
     font-size: 28px;
-}
-
-
-.age-section {
-    padding: 15px;
 }
 
 
