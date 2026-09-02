@@ -36,7 +36,9 @@
     <h1>Edmonton YSA Ward Finder</h1>
 
 
-    <!-- Age Information -->
+    <!-- ==================================================
+         AGE INFORMATION
+         ================================================== -->
 
     <div class="age-information">
 
@@ -67,15 +69,20 @@
     </div>
 
 
-    <!-- Address Search -->
+    <!-- ==================================================
+         ADDRESS SEARCH
+         ================================================== -->
 
     <p class="address-note">
+
         <strong>Edmonton addresses:</strong>
         Please be sure to include NW or SW in your street address.
+
     </p>
 
 
     <div class="search">
+
 
         <div class="input-group">
 
@@ -118,27 +125,44 @@
     </div>
 
 
+    <!-- ==================================================
+         SEARCH RESULT
+         ================================================== -->
+
     <div id="result"></div>
 
+
+    <!-- ==================================================
+         MAP
+         ================================================== -->
 
     <div id="map"></div>
 
 </div>
 
 
-<!-- Leaflet JavaScript -->
+<!-- ======================================================
+     LEAFLET JAVASCRIPT
+     ====================================================== -->
+
 <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
 
-<!-- KML → GeoJSON converter -->
+<!-- ======================================================
+     KML → GEOJSON CONVERTER
+     ====================================================== -->
+
 <script
     src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js">
 </script>
 
 
-<!-- Our JavaScript -->
+<!-- ======================================================
+     OUR JAVASCRIPT
+     ====================================================== -->
+
 <script src="app.js"></script>
 ```
 
