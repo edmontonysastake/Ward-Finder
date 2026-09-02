@@ -1,111 +1,146 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+```
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>Edmonton YSA Ward Finder</title>
+<title>Edmonton YSA Ward Finder</title>
 
-    <!-- Leaflet CSS -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    >
+<!-- Leaflet CSS -->
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+>
 
-    <!-- Our stylesheet -->
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+<!-- Our stylesheet -->
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+```
+
 </head>
-
 
 <body>
 
-    <div class="container">
+```
+<div class="container">
 
-        <h1>Edmonton YSA Ward Finder</h1>
-
-        <p>
-            Enter your address below to find your YSA ward.
-        </p>
-
-        <p class="address-note">
-            <strong>Edmonton addresses:</strong>
-            Please be sure to include NW or SW in your street address.
-        </p>
+    <h1>Edmonton YSA Ward Finder</h1>
 
 
-        <div class="search">
+    <!-- Age Information -->
 
-            <div class="input-group">
+    <div class="age-information">
 
-                <label for="address">
-                    Street Address
-                </label>
+        <div class="age-section">
 
-                <input
-                    type="text"
-                    id="address"
-                    placeholder="Example: 1234 56 Street NW"
-                >
+            <h2>For Young Single Adults Ages 26–35</h2>
 
-            </div>
-
-
-            <div class="input-group">
-
-                <label for="city">
-                    City
-                </label>
-
-                <input
-                    type="text"
-                    id="city"
-                    placeholder="Edmonton"
-                    value="Edmonton"
-                >
-
-            </div>
-
-
-            <button
-                id="findWardButton"
-                type="button"
-            >
-                Find My Ward
-            </button>
+            <p>
+                If you are a Young Single Adult between the ages of
+                26 and 35, your assigned ward is the
+                <strong>Riverside YSA Ward</strong>.
+            </p>
 
         </div>
 
 
-        <div id="result"></div>
+        <div class="age-section">
 
+            <h2>For Young Single Adults Ages 18–25</h2>
 
-        <div id="map"></div>
+            <p>
+                Enter your address below to identify your assigned
+                YSA ward based on your place of residence.
+            </p>
+
+        </div>
 
     </div>
 
 
-    <!-- Leaflet JavaScript -->
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-    </script>
+    <!-- Address Search -->
+
+    <p class="address-note">
+        <strong>Edmonton addresses:</strong>
+        Please be sure to include NW or SW in your street address.
+    </p>
 
 
-    <!-- KML → GeoJSON converter -->
-    <script
-        src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js">
-    </script>
+    <div class="search">
+
+        <div class="input-group">
+
+            <label for="address">
+                Street Address
+            </label>
+
+            <input
+                type="text"
+                id="address"
+                placeholder="Example: 1234 56 Street NW"
+            >
+
+        </div>
 
 
-    <!-- Our JavaScript -->
-    <script src="app.js"></script>
+        <div class="input-group">
+
+            <label for="city">
+                City
+            </label>
+
+            <input
+                type="text"
+                id="city"
+                placeholder="Edmonton"
+                value="Edmonton"
+            >
+
+        </div>
+
+
+        <button
+            id="findWardButton"
+            type="button"
+        >
+            Find My Ward
+        </button>
+
+    </div>
+
+
+    <div id="result"></div>
+
+
+    <div id="map"></div>
+
+</div>
+
+
+<!-- Leaflet JavaScript -->
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<!-- KML → GeoJSON converter -->
+<script
+    src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js">
+</script>
+
+
+<!-- Our JavaScript -->
+<script src="app.js"></script>
+```
 
 </body>
 
